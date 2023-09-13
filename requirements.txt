@@ -41,3 +41,4 @@ typing_extensions==4.7.1
 urllib3==2.0.4
 uvicorn==0.23.2
 zipp==3.16.2
+waiting==1.4.1
