@@ -15,7 +15,7 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
-device = "cpu"
+device = "cuda"
 model_id = "runwayml/stable-diffusion-v1-5"
 pipe = StableDiffusionPipeline.from_pretrained(model_id)
 pipe.to(device)
