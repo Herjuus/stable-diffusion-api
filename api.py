@@ -2,9 +2,9 @@ from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from io import BytesIO
 import base64
-import time
 from waiting import wait, TimeoutExpired
 from pydantic import BaseModel
+import torch
 from torch import autocast
 from diffusers import StableDiffusionPipeline
 
@@ -18,16 +18,16 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
-#----------STABLE-DIFFUSION CONFIG----------#
+#----------STABLE-DIFFUSION INIT----------#
 device = "cuda"
 model_id = "stabilityai/stable-diffusion-xl-base-1.0"
-pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16, use_safetensors=True)
+pipe = StableDiffusionPipeline.from_pretrained(model_id, use_safetensors=True)
 pipe.to(device)
 
-#----------UPSCALE CONFIG----------#
+#----------UPSCALE INIT----------#
 upscale_device = "cuda"
 upscale_model = "stabilityai/stable-diffusion-x4-upscaler"
-upscale_pipe = StableDiffusionPipeline.from_pretrained(upscale_model, torch_dtype=torch.float16)
+upscale_pipe = StableDiffusionPipeline.from_pretrained(upscale_model, use_safetensors=True)
 upscale_pipe.to(upscale_device)
 
 #----------QUEUE CONFIG----------#
@@ -75,6 +75,8 @@ def generate(prompt: str):
     
     upscaled_image.save(buffer, format="PNG")
     imgstr = base64.b64encode(buffer.getvalue())
+
+    upscaled_image.save("image.png")
 
     queue.remove(id)
 
