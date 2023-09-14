@@ -5,13 +5,12 @@ import base64
 import time
 from waiting import wait, TimeoutExpired
 from pydantic import BaseModel
-import torch
 from torch import autocast
 from diffusers import StableDiffusionPipeline
 
 
 #----------FAST-API CONFIG----------#
-app = FastAPI(title="STAI_AI_KAPTEIN")
+app = FastAPI(title="ARTISM")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
@@ -21,10 +20,15 @@ app.add_middleware(
 
 #----------STABLE-DIFFUSION CONFIG----------#
 device = "cuda"
-model_id = "runwayml/stable-diffusion-v1-5"
-pipe = StableDiffusionPipeline.from_pretrained(model_id)
+model_id = "stabilityai/stable-diffusion-xl-base-1.0"
+pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16, use_safetensors=True)
 pipe.to(device)
-steps = 1
+
+#----------UPSCALE CONFIG----------#
+upscale_device = "cuda"
+upscale_model = "stabilityai/stable-diffusion-x4-upscaler"
+upscale_pipe = StableDiffusionPipeline.from_pretrained(upscale_model, torch_dtype=torch.float16)
+upscale_pipe.to(upscale_device)
 
 #----------QUEUE CONFIG----------#
 queue = []
@@ -37,6 +41,7 @@ def getNextId():
     next_id += 1
     return id
 
+#----------RESPONSE----------#
 class ReturnObject(BaseModel):
     id: int
     prompt: str
@@ -60,11 +65,15 @@ def generate(prompt: str):
         return Response(e)
     
     with autocast(device):
-        image = pipe(prompt, num_inference_steps=steps, guidance_scale=6).images[0]
+        image = pipe(prompt, num_inference_steps=1, guidance_scale=6).images[0]
 
-    image.save("image.png")
     buffer = BytesIO()
     image.save(buffer, format="PNG")
+
+    with autocast(upscale_device):
+        upscaled_image = upscale_pipe(prompt, buffer)
+    
+    upscaled_image.save(buffer, format="PNG")
     imgstr = base64.b64encode(buffer.getvalue())
 
     queue.remove(id)
