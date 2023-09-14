@@ -45,10 +45,7 @@ class ReturnObject(BaseModel):
 #----------API----------#
 @app.get("/")
 def generate(prompt: str):
-    
-
     id = getNextId()
-
     queue.append(id)
 
     def isFirstInQueue(id):
