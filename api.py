@@ -21,14 +21,16 @@ app.add_middleware(
 #----------STABLE-DIFFUSION INIT----------#
 device = "cuda"
 model_id = "runwayml/stable-diffusion-v1-5"
-pipe = StableDiffusionPipeline.from_pretrained(model_id, use_safetensors=True)
+pipe = StableDiffusionPipeline.from_pretrained(model_id)
 pipe.to(device)
+pipe.enable_attention_slicing()
 
 #----------UPSCALE INIT----------#
-upscale_device = "cuda"
-upscale_model = "stabilityai/stable-diffusion-x4-upscaler"
-upscale_pipe = StableDiffusionPipeline.from_pretrained(upscale_model, use_safetensors=True)
-upscale_pipe.to(upscale_device)
+# upscale_device = "cuda"
+# upscale_model = "stabilityai/stable-diffusion-x4-upscaler"
+# upscale_pipe = StableDiffusionPipeline.from_pretrained(upscale_model, use_safetensors=True)
+# upscale_pipe.to(upscale_device)
+# pipe.enable_attention_slicing()
 
 #----------QUEUE CONFIG----------#
 queue = []
@@ -70,13 +72,17 @@ def generate(prompt: str):
     buffer = BytesIO()
     image.save(buffer, format="PNG")
 
-    with autocast(upscale_device):
-        upscaled_image = upscale_pipe(prompt, buffer)
-    
-    upscaled_image.save(buffer, format="PNG")
+    image.save("image.png")
+
     imgstr = base64.b64encode(buffer.getvalue())
 
-    upscaled_image.save("image.png")
+    # with autocast(upscale_device):
+    #     upscaled_image = upscale_pipe(prompt, buffer)
+    
+    # upscaled_image.save(buffer, format="PNG")
+    # imgstr = base64.b64encode(buffer.getvalue())
+
+    # upscaled_image.save("image.png")
 
     queue.remove(id)
 
