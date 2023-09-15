@@ -7,7 +7,6 @@ from pydantic import BaseModel
 import torch
 from torch import autocast
 from diffusers import StableDiffusionPipeline
-from diffusers import StableDiffusionXLPipeline
 
 
 #----------FAST-API CONFIG----------#
@@ -21,8 +20,8 @@ app.add_middleware(
 
 #----------STABLE-DIFFUSION INIT----------#
 device = "cuda"
-model_id = "stabilityai/stable-diffusion-xl-base-1.0"
-pipe = StableDiffusionXLPipeline.from_pretrained(model_id)
+model_id = "SG161222/Realistic_Vision_V5.1_noVAE"
+pipe = StableDiffusionPipeline.from_pretrained(model_id)
 pipe.to(device)
 
 #----------UPSCALE INIT----------#
@@ -50,7 +49,7 @@ class ReturnObject(BaseModel):
 
 #----------API----------#
 @app.get("/")
-def generate(prompt: str):
+def generate(prompt: str, negative: str):
     id = getNextId()
     queue.append(id)
 
@@ -66,7 +65,7 @@ def generate(prompt: str):
         return Response(e)
     
     with autocast(device):
-        image = pipe(prompt, num_inference_steps=1, guidance_scale=6).images[0]
+        image = pipe(prompt, negative_prompt=negative, num_inference_steps=1, guidance_scale=6).images[0]
 
     buffer = BytesIO()
     image.save(buffer, format="PNG")
