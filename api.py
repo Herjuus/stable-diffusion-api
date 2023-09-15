@@ -20,7 +20,7 @@ app.add_middleware(
 
 #----------STABLE-DIFFUSION INIT----------#
 device = "cuda"
-model_id = "stablediffusionapi/realistic-vision-v51"
+model_id = "SG161222/Realistic_Vision_V5.1_noVAE"
 pipe = StableDiffusionPipeline.from_pretrained(model_id)
 pipe.to(device)
 
