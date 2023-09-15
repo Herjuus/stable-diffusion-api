@@ -7,6 +7,7 @@ from pydantic import BaseModel
 import torch
 from torch import autocast
 from diffusers import StableDiffusionPipeline
+from PIL import Image
 
 
 #----------FAST-API CONFIG----------#
@@ -68,19 +69,21 @@ def generate(prompt: str, negative: str):
         image = pipe(prompt, negative_prompt=negative, num_inference_steps=1, guidance_scale=6).images[0]
 
     buffer = BytesIO()
-    image.save(buffer, format="PNG")
+    # image.save(buffer, format="PNG")
 
     image.save("image.png")
 
     # imgstr = base64.b64encode(buffer.getvalue())
+    path_to_lowres = "image.png"
+    lowres = Image.open(path_to_lowres).convert("RGB")
 
     with autocast(upscale_device):
-        upscaled_image = upscale_pipe(prompt, buffer.getvalue())
+        upscaled_image = upscale_pipe(prompt, lowres).images[0]
     
     upscaled_image.save(buffer, format="PNG")
-    imgstr = base64.b64encode(buffer)
+    imgstr = base64.b64encode(buffer.getvalue())
 
-    upscaled_image.save("image.png")
+    # upscaled_image.save("image.png")
 
     queue.remove(id)
 
