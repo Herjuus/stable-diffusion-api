@@ -8,6 +8,7 @@ import torch
 from torch import autocast
 from diffusers import StableDiffusionPipeline
 from PIL import Image
+from RealESRGAN import RealESRGAN
 
 
 #----------FAST-API CONFIG----------#
@@ -26,10 +27,9 @@ pipe = StableDiffusionPipeline.from_pretrained(model_id)
 pipe.to(device)
 
 #----------UPSCALE INIT----------#
-upscale_device = "cuda"
-upscale_model = "stabilityai/stable-diffusion-x4-upscaler"
-upscale_pipe = StableDiffusionPipeline.from_pretrained(upscale_model)
-upscale_pipe.to(upscale_device)
+upscale_device = torch.device("cuda")
+upscale_model = RealESRGAN(upscale_device, scale=4)
+upscale_model.load_weights('weights/RealESRGAN_x4.pth', download=True)
 
 #----------QUEUE CONFIG----------#
 queue = []
@@ -66,23 +66,15 @@ def generate(prompt: str, negative: str):
         return Response(e)
     
     with autocast(device):
-        image = pipe(prompt, negative_prompt=negative, num_inference_steps=1, guidance_scale=6).images[0]
+        image = pipe(prompt, negative_prompt=negative, num_inference_steps=25, guidance_scale=6).images[0]
 
     buffer = BytesIO()
     image.save(buffer, format="PNG")
 
-    image.save("image.png")
-
-    # imgstr = base64.b64encode(buffer.getvalue())
-    lowres = Image.open(buffer.getvalue()).convert("RGB")
-
-    with autocast(upscale_device):
-        upscaled_image = upscale_pipe(prompt, lowres).images[0]
-    
+    upscaled_image = upscale_model.predict(buffer.getvalue())
     upscaled_image.save(buffer, format="PNG")
-    imgstr = base64.b64encode(buffer.getvalue())
 
-    # upscaled_image.save("image.png")
+    imgstr = base64.b64encode(buffer.getvalue())
 
     queue.remove(id)
 

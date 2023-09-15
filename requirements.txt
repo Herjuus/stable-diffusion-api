@@ -41,3 +41,4 @@ zipp==3.16.2
 waiting==1.4.1
 invisible-watermark==0.2.0
 scipy==1.11.2
+RealESRGAN @ git+https://github.com/sberbank-ai/Real-ESRGAN.git@362a0316878f41dbdfbb23657b450c3353de5acf
