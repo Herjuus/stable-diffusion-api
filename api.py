@@ -69,10 +69,8 @@ def generate(prompt: str, negative: str):
         image = pipe(prompt, negative_prompt=negative, num_inference_steps=25, guidance_scale=6).images[0]
 
     buffer = BytesIO()
-    image.save(buffer, format="PNG")
-
-    upscaled_image = upscale_model.predict(buffer.getvalue())
-    buffer.flush()
+    
+    upscaled_image = upscale_model.predict(image)
     upscaled_image.save(buffer, format="PNG")
 
     imgstr = base64.b64encode(buffer.getvalue())
