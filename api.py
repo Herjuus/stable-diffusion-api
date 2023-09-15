@@ -20,17 +20,15 @@ app.add_middleware(
 
 #----------STABLE-DIFFUSION INIT----------#
 device = "cuda"
-model_id = "runwayml/stable-diffusion-v1-5"
+model_id = "stabilityai/stable-diffusion-2-1"
 pipe = StableDiffusionPipeline.from_pretrained(model_id)
 pipe.to(device)
-pipe.enable_attention_slicing()
 
 #----------UPSCALE INIT----------#
 # upscale_device = "cuda"
 # upscale_model = "stabilityai/stable-diffusion-x4-upscaler"
-# upscale_pipe = StableDiffusionPipeline.from_pretrained(upscale_model, use_safetensors=True)
+# upscale_pipe = StableDiffusionPipeline.from_pretrained(upscale_model)
 # upscale_pipe.to(upscale_device)
-# pipe.enable_attention_slicing()
 
 #----------QUEUE CONFIG----------#
 queue = []
