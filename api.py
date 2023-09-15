@@ -69,13 +69,12 @@ def generate(prompt: str, negative: str):
         image = pipe(prompt, negative_prompt=negative, num_inference_steps=1, guidance_scale=6).images[0]
 
     buffer = BytesIO()
-    # image.save(buffer, format="PNG")
+    image.save(buffer, format="PNG")
 
     image.save("image.png")
 
     # imgstr = base64.b64encode(buffer.getvalue())
-    path_to_lowres = "image.png"
-    lowres = Image.open(path_to_lowres).convert("RGB")
+    lowres = Image.open(buffer.getvalue()).convert("RGB")
 
     with autocast(upscale_device):
         upscaled_image = upscale_pipe(prompt, lowres).images[0]
