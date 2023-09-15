@@ -78,7 +78,7 @@ def generate(prompt: str, negative: str):
         upscaled_image = upscale_pipe(prompt, buffer.getvalue())
     
     upscaled_image.save(buffer, format="PNG")
-    imgstr = base64.b64encode(buffer.getvalue())
+    imgstr = base64.b64encode(buffer)
 
     upscaled_image.save("image.png")
 
