@@ -25,10 +25,10 @@ pipe = StableDiffusionPipeline.from_pretrained(model_id)
 pipe.to(device)
 
 #----------UPSCALE INIT----------#
-# upscale_device = "cuda"
-# upscale_model = "stabilityai/stable-diffusion-x4-upscaler"
-# upscale_pipe = StableDiffusionPipeline.from_pretrained(upscale_model)
-# upscale_pipe.to(upscale_device)
+upscale_device = "cuda"
+upscale_model = "stabilityai/stable-diffusion-x4-upscaler"
+upscale_pipe = StableDiffusionPipeline.from_pretrained(upscale_model)
+upscale_pipe.to(upscale_device)
 
 #----------QUEUE CONFIG----------#
 queue = []
@@ -72,15 +72,15 @@ def generate(prompt: str, negative: str):
 
     image.save("image.png")
 
-    imgstr = base64.b64encode(buffer.getvalue())
-
-    # with autocast(upscale_device):
-    #     upscaled_image = upscale_pipe(prompt, buffer)
-    
-    # upscaled_image.save(buffer, format="PNG")
     # imgstr = base64.b64encode(buffer.getvalue())
 
-    # upscaled_image.save("image.png")
+    with autocast(upscale_device):
+        upscaled_image = upscale_pipe(prompt, buffer.getvalue())
+    
+    upscaled_image.save(buffer, format="PNG")
+    imgstr = base64.b64encode(buffer.getvalue())
+
+    upscaled_image.save("image.png")
 
     queue.remove(id)
 
