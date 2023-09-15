@@ -7,6 +7,7 @@ from pydantic import BaseModel
 import torch
 from torch import autocast
 from diffusers import StableDiffusionPipeline
+from diffusers import StableDiffusionXLPipeline
 
 
 #----------FAST-API CONFIG----------#
@@ -20,7 +21,7 @@ app.add_middleware(
 
 #----------STABLE-DIFFUSION INIT----------#
 device = "cuda"
-model_id = "SG161222/Realistic_Vision_V5.1_noVAE"
+model_id = "stabilityai/stable-diffusion-xl-base-1.0"
 pipe = StableDiffusionPipeline.from_pretrained(model_id)
 pipe.to(device)
 
