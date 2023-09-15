@@ -72,6 +72,7 @@ def generate(prompt: str, negative: str):
     image.save(buffer, format="PNG")
 
     upscaled_image = upscale_model.predict(buffer.getvalue())
+    buffer.flush()
     upscaled_image.save(buffer, format="PNG")
 
     imgstr = base64.b64encode(buffer.getvalue())
