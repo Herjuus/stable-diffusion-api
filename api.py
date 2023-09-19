@@ -89,7 +89,7 @@ async def generate(prompt: str):
 
     return ReturnObject(id=id, prompt=prompt, image=imgstr)
 
-@socket_manager.sio.on("send-prompt")
+@socket_manager.on("send-prompt")
 def sendPrompt(sid, data):
     socket_manager.emit("recieve-prompt", data)
     print(data)
