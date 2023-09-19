@@ -12,8 +12,6 @@ from diffusers import StableDiffusionPipeline
 from PIL import Image
 from RealESRGAN import RealESRGAN
 
-from socket_handlers import emit
-
 
 #----------FAST-API CONFIG----------#
 app = FastAPI(title="ARTISM")
