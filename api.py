@@ -21,7 +21,7 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
-socket_manager = SocketManager(app=app, mount_location="/socket", socketio_path="/socket", cors_allowed_origins="*")
+socket = SocketManager(app=app, cors_allowed_origins="*", async_mode="asgi")
 
 #----------STABLE-DIFFUSION INIT----------#
 device = "cuda"
@@ -73,7 +73,7 @@ async def generate(prompt: str):
     dateTime = datetime.datetime.now()
     time = f"{dateTime.hour}:{dateTime.minute}"
 
-    await socket_manager.emit("send-prompt", { time, prompt })
+    await socket.emit("prompt", { "time": time, "prompt": prompt })
     
     with autocast(device):
         image = pipe(prompt, negative_prompt=negative, num_inference_steps=25, guidance_scale=6).images[0]
@@ -89,7 +89,3 @@ async def generate(prompt: str):
 
     return ReturnObject(id=id, prompt=prompt, image=imgstr)
 
-@socket_manager.on("send-prompt")
-def sendPrompt(sid, data):
-    socket_manager.emit("recieve-prompt", data)
-    print(data)
