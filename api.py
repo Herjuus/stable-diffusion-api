@@ -68,10 +68,7 @@ async def generate(prompt: str, negative: str):
         queue.remove(id)
         return Response(e)
     
-    currentTime = datetime.datetime.now()
-    time = f"{currentTime.hour}:{currentTime.minute}"
-    
-    await socket_manager.emit("prompt", { prompt, time })
+    emit(prompt=prompt)
     
     with autocast(device):
         image = pipe(prompt, negative_prompt=negative, num_inference_steps=25, guidance_scale=6).images[0]
@@ -87,6 +84,8 @@ async def generate(prompt: str, negative: str):
 
     return ReturnObject(id=id, prompt=prompt, image=imgstr)
 
-@socket_manager.on('connect')
-async def handle_connect(sid):
-    await socket_manager.emit('connect', 'join')
+async def emit(prompt): 
+    currentTime = datetime.datetime.now()
+    time = f"{currentTime.hour}:{currentTime.minute}"
+    
+    await socket_manager.emit("prompt", { prompt, time })
