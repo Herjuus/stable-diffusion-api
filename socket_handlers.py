@@ -1,4 +1,4 @@
-from .api import socket_manager as sm
+from api import socket_manager as sm
 import datetime
 
 @sm.on("prompt")
