@@ -86,3 +86,7 @@ async def generate(prompt: str, negative: str):
     queue.remove(id)
 
     return ReturnObject(id=id, prompt=prompt, image=imgstr)
+
+@socket_manager.on('connect')
+async def handle_connect(sid):
+    await socket_manager.emit('connect', 'join')
