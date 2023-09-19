@@ -1,7 +1,7 @@
-from api import app
+from .api import socket_manager as sm
 import datetime
 
-@app.sio.on("prompt")
+@sm.on("prompt")
 async def listenprompt(sid, *args, **kwargs):
     print(args)
 
@@ -9,4 +9,4 @@ async def emit(prompt):
     currentTime = datetime.datetime.now()
     time = f"{currentTime.hour}:{currentTime.minute}"
 
-    await app.sio.emit("prompt", { prompt, time })
+    await sm.emit("prompt", { prompt, time })
