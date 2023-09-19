@@ -12,6 +12,8 @@ from diffusers import StableDiffusionPipeline
 from PIL import Image
 from RealESRGAN import RealESRGAN
 
+from .socket_handlers import emit
+
 
 #----------FAST-API CONFIG----------#
 app = FastAPI(title="ARTISM")
@@ -70,7 +72,7 @@ async def generate(prompt: str):
         queue.remove(id)
         return Response(e)
     
-    emit(prompt=prompt)
+    await emit(prompt=prompt)
     
     with autocast(device):
         image = pipe(prompt, negative_prompt=negative, num_inference_steps=25, guidance_scale=6).images[0]
@@ -85,13 +87,3 @@ async def generate(prompt: str):
     queue.remove(id)
 
     return ReturnObject(id=id, prompt=prompt, image=imgstr)
-
-async def emit(prompt): 
-    currentTime = datetime.datetime.now()
-    time = f"{currentTime.hour}:{currentTime.minute}"
-    
-    await socket_manager.emit("prompt", { prompt, time })
-
-socket_manager.on("prompt")
-async def listenprompt(sid, *args, **kwargs):
-    print(args)
