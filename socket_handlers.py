@@ -10,3 +10,7 @@ async def emit(prompt):
     time = f"{currentTime.hour}:{currentTime.minute}"
 
     await sm.emit("prompt", { prompt, time })
+
+if __name__ == "__main__":
+    emit()
+    listenprompt()
