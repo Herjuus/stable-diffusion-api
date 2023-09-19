@@ -21,7 +21,7 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
-socket_manager = SocketManager(app=app)
+socket_manager = SocketManager(app=app, mount_location="socket", socketio_path="socket")
 
 #----------STABLE-DIFFUSION INIT----------#
 device = "cuda"
