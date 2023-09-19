@@ -1,4 +1,6 @@
 from fastapi import FastAPI, Response
+from fastapi_socketio import SocketManager
+import datetime
 from fastapi.middleware.cors import CORSMiddleware
 from io import BytesIO
 import base64
@@ -19,10 +21,11 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+socket_manager = SocketManager(app=app)
 
 #----------STABLE-DIFFUSION INIT----------#
 device = "cuda"
-model_id = "SG161222/Realistic_Vision_V5.1_noVAE"
+model_id = "Lykon/dreamshaper-8"
 pipe = StableDiffusionPipeline.from_pretrained(model_id)
 pipe.to(device)
 
@@ -50,7 +53,7 @@ class ReturnObject(BaseModel):
 
 #----------API----------#
 @app.get("/")
-def generate(prompt: str, negative: str):
+async def generate(prompt: str, negative: str):
     id = getNextId()
     queue.append(id)
 
@@ -64,6 +67,11 @@ def generate(prompt: str, negative: str):
     except TimeoutExpired as e:
         queue.remove(id)
         return Response(e)
+    
+    currentTime = datetime.datetime.now()
+    time = f"{currentTime.hour}:{currentTime.minute}"
+    
+    await socket_manager.emit("prompt", { prompt, time })
     
     with autocast(device):
         image = pipe(prompt, negative_prompt=negative, num_inference_steps=25, guidance_scale=6).images[0]
