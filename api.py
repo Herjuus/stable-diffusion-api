@@ -26,7 +26,7 @@ socket_manager = SocketManager(app=app)
 #----------STABLE-DIFFUSION INIT----------#
 device = "cuda"
 model_id = "Lykon/dreamshaper-8"
-pipe = StableDiffusionPipeline.from_pretrained(model_id)
+pipe = StableDiffusionPipeline.from_pretrained(model_id, safety_checker=None)
 pipe.to(device)
 
 #----------UPSCALE INIT----------#
