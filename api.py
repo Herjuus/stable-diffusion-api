@@ -70,7 +70,10 @@ async def generate(prompt: str):
         queue.remove(id)
         return Response(e)
     
-    await emit(prompt=prompt)
+    dateTime = datetime.datetime.now()
+    time = f"{dateTime.hour}:{dateTime.minute}"
+
+    await socket_manager.emit("send-prompt", { time, prompt })
     
     with autocast(device):
         image = pipe(prompt, negative_prompt=negative, num_inference_steps=25, guidance_scale=6).images[0]
@@ -86,13 +89,7 @@ async def generate(prompt: str):
 
     return ReturnObject(id=id, prompt=prompt, image=imgstr)
 
-@app.sio.on("prompt")
-async def listenprompt(sid, *args, **kwargs):
-    print(args)
-
-async def emit(prompt): 
-    currentTime = datetime.datetime.now()
-    time = f"{currentTime.hour}:{currentTime.minute}"
-
-    await app.sio.emit("prompt", { prompt, time })
-
+@socket_manager.sio.on("send-prompt")
+def sendPrompt(sid, data):
+    socket_manager.emit("recieve-prompt", data)
+    print(data)
