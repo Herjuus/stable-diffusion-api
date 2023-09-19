@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Response
 from fastapi_socketio import SocketManager
-from fastapi_socketio import SocketIO, BaseSocket
 import datetime
 from fastapi.middleware.cors import CORSMiddleware
 from io import BytesIO
@@ -22,7 +21,7 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
-socket = SocketIO(app, async_mode='asgi')
+socket_manager = SocketManager()
 
 #----------STABLE-DIFFUSION INIT----------#
 device = "cuda"
@@ -54,7 +53,9 @@ class ReturnObject(BaseModel):
 
 #----------API----------#
 @app.get("/")
-async def generate(prompt: str, negative: str):
+async def generate(prompt: str):
+    negative = ""
+
     id = getNextId()
     queue.append(id)
 
@@ -89,8 +90,8 @@ async def emit(prompt):
     currentTime = datetime.datetime.now()
     time = f"{currentTime.hour}:{currentTime.minute}"
     
-    await socket.emit("prompt", { prompt, time })
+    await socket_manager.emit("prompt", { prompt, time })
 
-@socket.on('prompt')
-def getPrompt(sid, data):
-    print(data)
+socket_manager.on("prompt")
+async def listenprompt(sid, *args, **kwargs):
+    print(args)
