@@ -70,11 +70,6 @@ async def generate(prompt: str):
         queue.remove(id)
         return Response(e)
     
-    dateTime = datetime.datetime.now()
-    time = f"{dateTime.hour}:{dateTime.minute}"
-
-    await socket.emit("prompt", { "time": time, "prompt": prompt })
-    
     with autocast(device):
         image = pipe(prompt, negative_prompt=negative, num_inference_steps=25, guidance_scale=6).images[0]
 
@@ -87,5 +82,10 @@ async def generate(prompt: str):
 
     queue.remove(id)
 
+    dateTime = datetime.datetime.now()
+    time = f"{dateTime.hour}:{dateTime.minute}"
+
+    await socket.emit("prompt", { "time": time, "prompt": prompt })
+    
     return ReturnObject(id=id, prompt=prompt, image=imgstr)
 
