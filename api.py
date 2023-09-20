@@ -21,7 +21,7 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
-socket = SocketManager(app=app, cors_allowed_origins=[], async_mode="asgi")
+# socket = SocketManager(app=app, cors_allowed_origins=[], async_mode="asgi")
 
 #----------STABLE-DIFFUSION INIT----------#
 device = "cuda"
@@ -51,11 +51,11 @@ class ReturnObject(BaseModel):
     prompt: str
     image: str
 
-async def sendPrompt(id, prompt):
-    dateTime = datetime.datetime.now()
-    time = f"{dateTime.hour}:{dateTime.minute}"
+# async def sendPrompt(id, prompt):
+#     dateTime = datetime.datetime.now()
+#     time = f"{dateTime.hour}:{dateTime.minute}"
 
-    await socket.emit("prompt", { "time": time, "prompt": prompt, "id": id })
+#     await socket.emit("prompt", { "time": time, "prompt": prompt, "id": id })
 
 #----------API----------#
 @app.get("/")
