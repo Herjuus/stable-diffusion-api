@@ -53,11 +53,7 @@ class ReturnObject(BaseModel):
 
 #----------API----------#
 @app.get("/")
-async def generate(prompt: str):
-    dateTime = datetime.datetime.now()
-    time = f"{dateTime.hour}:{dateTime.minute}"
-
-    await socket.emit("prompt", { "time": time, "prompt": prompt })
+def generate(prompt: str):
 
     negative = ""
 
@@ -77,6 +73,11 @@ async def generate(prompt: str):
     
     with autocast(device):
         image = pipe(prompt, negative_prompt=negative, num_inference_steps=25, guidance_scale=6).images[0]
+
+    dateTime = datetime.datetime.now()
+    time = f"{dateTime.hour}:{dateTime.minute}"
+
+    socket.emit("prompt", { "time": time, "prompt": prompt })
 
     buffer = BytesIO()
     
