@@ -54,6 +54,11 @@ class ReturnObject(BaseModel):
 #----------API----------#
 @app.get("/")
 async def generate(prompt: str):
+    dateTime = datetime.datetime.now()
+    time = f"{dateTime.hour}:{dateTime.minute}"
+
+    await socket.emit("prompt", { "time": time, "prompt": prompt })
+
     negative = ""
 
     id = getNextId()
@@ -82,10 +87,5 @@ async def generate(prompt: str):
 
     queue.remove(id)
 
-    dateTime = datetime.datetime.now()
-    time = f"{dateTime.hour}:{dateTime.minute}"
-
-    await socket.emit("prompt", { "time": time, "prompt": prompt })
-    
     return ReturnObject(id=id, prompt=prompt, image=imgstr)
 
