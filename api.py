@@ -53,7 +53,7 @@ class ReturnObject(BaseModel):
 
 #----------API----------#
 @app.get("/")
-def generate(prompt: str):
+async def generate(prompt: str):
 
     negative = ""
 
@@ -77,7 +77,7 @@ def generate(prompt: str):
     dateTime = datetime.datetime.now()
     time = f"{dateTime.hour}:{dateTime.minute}"
 
-    socket.emit("prompt", { "time": time, "prompt": prompt })
+    await socket.emit("prompt", { "time": time, "prompt": prompt, "id": id })
 
     buffer = BytesIO()
     
