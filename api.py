@@ -21,7 +21,7 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
-socket = SocketManager(app=app, cors_allowed_origins=["*"], async_mode="asgi")
+socket = SocketManager(app=app, cors_allowed_origins=["*", "localhost:3000", "10.58.177.194"], async_mode="asgi")
 
 #----------STABLE-DIFFUSION INIT----------#
 device = "cuda"
