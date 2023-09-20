@@ -59,7 +59,7 @@ async def sendPrompt(id, prompt):
 
 #----------API----------#
 @app.get("/")
-def generate(prompt: str):
+async def generate(prompt: str):
 
     negative = ""
 
@@ -80,7 +80,7 @@ def generate(prompt: str):
     with autocast(device):
         image = pipe(prompt, negative_prompt=negative, num_inference_steps=25, guidance_scale=6).images[0]
 
-    sendPrompt(id, prompt)
+    await sendPrompt(id, prompt)
 
     buffer = BytesIO()
     
