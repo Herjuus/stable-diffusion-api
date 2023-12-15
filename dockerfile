@@ -1,6 +1,6 @@
 FROM python:3.11
 
-RUN apt-get update && apt-get install -y git && apt-get install libgl1
+RUN apt-get update && apt-get install -y git && apt-get -y install libgl1
 
 RUN pip install --upgrade pip
 
