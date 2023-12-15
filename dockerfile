@@ -6,11 +6,9 @@ RUN pip install --upgrade pip
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY . .
 
 RUN pip install -r requirements.txt
-
-COPY . /app
 
 EXPOSE 8000
 
