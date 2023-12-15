@@ -9,7 +9,6 @@ from pydantic import BaseModel
 import torch
 from torch import autocast
 from diffusers import StableDiffusionPipeline, StableDiffusionXLPipeline
-
 from PIL import Image
 from RealESRGAN import RealESRGAN
 
@@ -26,7 +25,7 @@ app.add_middleware(
 
 #----------STABLE-DIFFUSION INIT----------#
 device = "cuda"
-model_id = "Lykon/dreamshaper-8"
+model_id = "Yntec/dreamshaper-8"
 pipe = StableDiffusionPipeline.from_pretrained(model_id, safety_checker=None)
 pipe.to(device)
 
@@ -50,7 +49,8 @@ def getNextId():
 class ReturnObject(BaseModel):
     id: int
     prompt: str
-    image: str
+    image_small: str
+    image_large: str
 
 # async def sendPrompt(id, prompt):
 #     dateTime = datetime.datetime.now()
@@ -87,10 +87,15 @@ async def generate(prompt: str):
     
     upscaled_image = upscale_model.predict(image)
     upscaled_image.save(buffer, format="PNG")
-
     imgstr = base64.b64encode(buffer.getvalue())
+
+    buffer.seek(0)
+    buffer.truncate(0)
+
+    image.save(buffer, format="PNG")
+    img_small = base64.b64encode(buffer.getvalue())
 
     queue.remove(id)
 
-    return ReturnObject(id=id, prompt=prompt, image=imgstr)
+    return ReturnObject(id=id, prompt=prompt, image_small=img_small, image_large=imgstr)
 
