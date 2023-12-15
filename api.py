@@ -8,7 +8,8 @@ from waiting import wait, TimeoutExpired
 from pydantic import BaseModel
 import torch
 from torch import autocast
-from diffusers import StableDiffusionPipeline
+from diffusers import StableDiffusionPipeline, StableDiffusionXLPipeline
+
 from PIL import Image
 from RealESRGAN import RealESRGAN
 
